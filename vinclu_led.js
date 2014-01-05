@@ -68,7 +68,7 @@ var VincluLed = function( frequencyL , frequencyR ){
     };
 
     //ブリンクの実装
-    this.on_blink = function( interval ){
+    this.blinkOn = function( interval ){
         if(this.isBlink == false){
             this.isBlink = true;
             //LED 点灯
@@ -85,7 +85,7 @@ var VincluLed = function( frequencyL , frequencyR ){
     	}
     }
 
-    this.off_blink = function(){
+    this.blinkOff = function(){
     	//LED 消灯
         this.isBlink = false;
         clearInterval(this.blinkTimer);
