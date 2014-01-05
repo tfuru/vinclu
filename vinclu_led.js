@@ -8,14 +8,17 @@ var VincluLed = function( frequencyL , frequencyR ){
     this.frequencyL = frequencyL;
     this.frequencyR = frequencyR;
 
+    this.gain_node = null;
+    this.isBlink = false;
+
     this.init = function(){
         this.audio_context = new webkitAudioContext();
+	//44100 は変更しない事
+        this.audio_context.samplingRate = 44100;
     };
 
     //再生する音のバッファーを作成する
     this.createAudioDataBuffer = function(context,frequencyL,frequencyR){
-        //44100 は変更しない事
-        context.samplingRate = 44100;
         var s = context.samplingRate * 2;
         var buffer = context.createBuffer(2, s, context.samplingRate);
         var audioDataL = buffer.getChannelData(0);
@@ -28,6 +31,16 @@ var VincluLed = function( frequencyL , frequencyR ){
         }
         return buffer;
     };
+
+    //明るさ調整
+    this.setBrightness = function(volume){
+        if(this.gain_node == null){
+            this.gain_node = this.audio_context.createGainNode();
+            this.audio_node.connect(this.gain_node);
+            this.gain_node.connect(this.audio_context.destination);
+        }
+        this.gain_node.gain.value = volume;
+    }
 
     //LEDの電源をON
     this.on = function(){
@@ -45,13 +58,39 @@ var VincluLed = function( frequencyL , frequencyR ){
 
     //LEDの電源をOFF
     this.off = function( ){
-        _this = this;
-        if( _this.isOn ){
+        if( this.isOn ){
             console.log('off');
-            _this.isOn = false;
-            _this.audio_node.noteOff(0);
+            this.isOn = false;
+            this.audio_node.noteOff(0);
+            this.audio_node = null;
+            this.gain_node = null;
         }
     };
+
+    //ブリンクの実装
+    this.on_blink = function( interval ){
+        if(this.isBlink == false){
+            this.isBlink = true;
+            //LED 点灯
+            this.on();
+            var v = 0,i= 0.1;
+            var fnc = function(){
+                v -= i;
+                if(v <= -0.5) i = -0.1;
+                else if(v >= 0.0) i = 0.1;
+                //明るさ調整
+                this.setBrightness(v);
+            };
+            this.blinkTimer = setInterval($.proxy(fnc,this),interval);
+    	}
+    }
+
+    this.off_blink = function(){
+    	//LED 消灯
+        this.isBlink = false;
+        clearInterval(this.blinkTimer);
+        this.off();
+    }
 
     //初期化
     this.init();
