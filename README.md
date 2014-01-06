@@ -1,4 +1,8 @@
 vinclu
+
+実装サンプル
+http://jsdo.it/t_furu/iP0O
+
 ======
 
     // jqery ライブラリの読み込み
@@ -9,16 +13,10 @@ vinclu
     <script type="text/javascript">
     // 点灯
     led1 = new VincluLed(100,100);
-    // 激しく点滅　
-    led2 = new VincluLed(100, 1);
-    // 緩やかな点滅
-    led3 = new VincluLed(100, 10);
-    
-    // 点灯
-    led1.on();
-    // 消灯
-    led1.off();
-
+    //Blink開始 穏やかに瞬く
+    led1.blinkOn(200);
+    //Blink停止
+    led1.blinkOff();
     </script>
 
 ======
